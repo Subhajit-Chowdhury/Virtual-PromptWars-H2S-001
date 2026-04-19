@@ -3,49 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antigravity | Data Assistant</title>
+    <title>Antigravity | Assistant</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="app-container">
-        <header>
-            <div class="logo">
-                <span class="gradient-text">Antigravity</span>
-                <span class="sub-logo">Data Intelligence</span>
+    <div class="app-wrapper">
+        <header class="app-header">
+            <div class="brand">
+                <h1 class="logo-text">Antigravity</h1>
+                <p class="tagline">Data Intelligence</p>
             </div>
-            <div class="status-badge">
-                <span class="indicator"></span> Live Data Pipeline
+            <div class="status-pill">
+                <span class="dot"></span> Live Pipeline
             </div>
         </header>
 
-        <main id="chat-container">
-            <div class="message assistant">
-                <div class="avatar">🤖</div>
-                <div class="content">
-                    <p>Hi there! 👋 I'm your **Antigravity Data Assistant**.</p>
-                    <p>I'm ready to help you crunch some numbers or manage your schedule. What's on your mind today?</p>
+        <main id="chat-window">
+            <div class="message-group assistant">
+                <div class="msg-avatar">🤖</div>
+                <div class="msg-content">
+                    <p>Hi! I'm your **Antigravity Assistant**. How can I help you with your data today? 👋</p>
                 </div>
             </div>
         </main>
 
-        <div class="suggestions">
-            <button class="chip" onclick="handleSuggestion('Summarize my sales sheet')">📊 Summarize Data</button>
-            <button class="chip" onclick="handleSuggestion('Who is the top customer segment?')">👤 Top Segment</button>
-            <button class="chip" onclick="handleSuggestion('Set a reminder to review data at 5pm')">⏰ Set Reminder</button>
-        </div>
-
-        <footer>
-            <div class="input-wrapper">
-                <input type="text" id="user-input" placeholder="Type a message..." autocomplete="off">
-                <button id="send-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        <section class="controls">
+            <div class="quick-actions">
+                <button class="action-chip" onclick="handleSuggestion('Summarize my sales sheet')">📊 Summarize</button>
+                <button class="action-chip" onclick="handleSuggestion('Who is the top segment?')">👤 Top Segment</button>
+                <button class="action-chip" onclick="handleSuggestion('Set a reminder to review data')">⏰ Reminder</button>
+            </div>
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Ask anything about your data..." autocomplete="off">
+                <button id="send-btn" title="Send message">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </div>
-            <p class="footer-note">Powered by Google Gemini & Google Services</p>
-        </footer>
+            <p class="legal-text">Powered by Google Gemini & Sheets</p>
+        </section>
     </div>
 
     <script src="{{ url_for('static', filename='js/chat.js') }}"></script>

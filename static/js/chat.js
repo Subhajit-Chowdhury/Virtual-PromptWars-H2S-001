@@ -1,10 +1,10 @@
-const chatContainer = document.getElementById('chat-container');
+const chatContainer = document.getElementById('chat-window');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 
 function appendMessage(role, text) {
     const msgDiv = document.createElement('div');
-    msgDiv.className = `message ${role}`;
+    msgDiv.className = `message-group ${role}`;
     
     // Convert newlines to breaks and simple markdown-like formatting
     const formattedText = text.replace(/\n/g, '<br>')
@@ -12,8 +12,8 @@ function appendMessage(role, text) {
                               .replace(/\*(.*?)\*/g, '<em>$1</em>');
 
     msgDiv.innerHTML = `
-        <div class="avatar">${role === 'assistant' ? '🤖' : '👤'}</div>
-        <div class="content">
+        <div class="msg-avatar">${role === 'assistant' ? '🤖' : '👤'}</div>
+        <div class="msg-content">
             <p>${formattedText}</p>
         </div>
     `;
@@ -29,15 +29,14 @@ async function sendMessage(customText = null) {
     if (!customText) userInput.value = '';
     appendMessage('user', text);
 
-    // Skeleton Loader instead of just dots
+    // Skeleton Loader for Classic Style
     const typingDiv = document.createElement('div');
-    typingDiv.className = 'message assistant typing';
+    typingDiv.className = 'message-group assistant typing';
     typingDiv.innerHTML = `
-        <div class="avatar">🤖</div>
-        <div class="content">
-            <div class="skeleton sk-1"></div><br>
-            <div class="skeleton sk-2"></div><br>
-            <div class="skeleton sk-3"></div>
+        <div class="msg-avatar">🤖</div>
+        <div class="msg-content">
+            <div class="skeleton sk-1"></div>
+            <div class="skeleton sk-2"></div>
         </div>`;
     chatContainer.appendChild(typingDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -59,7 +58,7 @@ async function sendMessage(customText = null) {
         }
     } catch (error) {
         if (chatContainer.contains(typingDiv)) chatContainer.removeChild(typingDiv);
-        appendMessage('assistant', "I'm having trouble connecting to my brain! Please check your Vercel Environment Variables (GEMINI_API_KEY, SPREADSHEET_ID, etc).");
+        appendMessage('assistant', "I'm having trouble connecting to my brain! Please check your Vercel Environment Variables.");
         console.error('Error:', error);
     }
 }
