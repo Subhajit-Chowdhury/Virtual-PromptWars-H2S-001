@@ -4,7 +4,7 @@ from googleapiclient.discovery import build
 
 class SheetsHandler:
     def __init__(self):
-        self.scopes = ['https://www.googleapis.com/auth/spreadsheets.readonly']
+        self.scopes = ['https://www.googleapis.com/auth/spreadsheets']
         self.creds_path = os.getenv('GOOGLE_CREDENTIALS_PATH')
         self.spreadsheet_id = os.getenv('SPREADSHEET_ID')
         
@@ -15,11 +15,15 @@ class SheetsHandler:
             self.creds_path, scopes=self.scopes)
         self.service = build('sheets', 'v4', credentials=self.creds)
 
-    def get_sheet_data(self, range_name='SalesData!A1:H100'):
-        """Fetches data from the spreadsheet."""
+    def get_sheet_data(self):
+        """Fetches data from the first tab of the spreadsheet."""
         try:
-            sheet = self.service.spreadsheets()
-            result = sheet.values().get(spreadsheetId=self.spreadsheet_id,
+            # Dynamically detect the first sheet name to be robust against renames
+            spreadsheet = self.service.spreadsheets().get(spreadsheetId=self.spreadsheet_id).execute()
+            sheet_name = spreadsheet['sheets'][0]['properties']['title']
+            
+            range_name = f"{sheet_name}!A1:H100"
+            result = self.service.spreadsheets().values().get(spreadsheetId=self.spreadsheet_id,
                                         range=range_name).execute()
             values = result.get('values', [])
             
