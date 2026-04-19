@@ -15,7 +15,7 @@ Designed to solve the problem of managing attendance, waiting times, and real-ti
 
 ---
 
-## 🧭 Approach and logic
+## Approach and logic
 
 At large-scale events, operational delays happen because crowd density data (gate traffic, wait times) sits in a dashboard, while team coordination happens in separate apps. The gap between seeing a bottleneck and deploying staff ruins attendee experience.
 
@@ -23,7 +23,7 @@ Our logic is to **unify insight and action**. DataPulse reads live crowd metrics
 
 ---
 
-## ⚙️ How the solution works
+## How the solution works
 
 DataPulse is a conversational assistant that connects data access with action handling in a single chat interface.
 
