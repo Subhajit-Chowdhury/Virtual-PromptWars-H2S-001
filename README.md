@@ -8,42 +8,29 @@
 
 ---
 
-## 📋 Problem Statement Alignment (Virtual: PromptWars)
+## Your chosen vertical
 
-**The Challenge:** Design a solution that improves the physical event experience for attendees at large-scale venues (stadiums, conference centers, transit hubs) by addressing Crowd Management, Waiting Times, and Real-time Coordination.
-
-**The DataPulse Solution:**
-DataPulse is an AI-powered **Venue Operations Assistant**. At large-scale events, operational delays happen because crowd density data (gate traffic, wait times) sits in a dashboard, while team coordination happens in separate apps. 
-
-DataPulse bridges this gap for ground teams:
-- **Crowd Management & Waiting Times:** It reads live crowd metrics and sensor data from Google Sheets, providing instant answers about queue lengths and gate congestion.
-- **Real-time Coordination:** When an operational bottleneck is found (e.g., "Gate B is overcrowded"), the operations manager can tell the AI to instantly create a calendar event to deploy staff, resolving the issue before it impacts attendee experience.
+**Smart Venue Management & Operations Data Assistant**
+Designed to solve the problem of managing attendance, waiting times, and real-time coordination at large-scale venues (stadiums, conference centers, transit hubs).
 
 ---
 
-## 🎯 Objective
+## 🧭 Approach and logic
 
-Design an operations system that can:
+At large-scale events, operational delays happen because crowd density data (gate traffic, wait times) sits in a dashboard, while team coordination happens in separate apps. The gap between seeing a bottleneck and deploying staff ruins attendee experience.
 
-- Read and analyze live venue data
-- Respond to ground staff queries in natural language
-- Enable immediate real-time coordination (staff dispatch)
-- Maintain reliable crowd reports through data validation
-
-**Constraint:** Everything must happen within a single rapid-response chat interface to minimize operational latency at the venue.
+Our logic is to **unify insight and action**. DataPulse reads live crowd metrics and sensor data from Google Sheets, providing instant answers about queue lengths. When an operational bottleneck is found (e.g., "Gate B is overcrowded"), the operations manager can tell the AI to instantly create a calendar event to deploy staff, resolving the issue proactively.
 
 ---
 
-## ⚙️ Approach
+## ⚙️ How the solution works
 
-DataPulse is a conversational assistant that connects data access with action handling.
+DataPulse is a conversational assistant that connects data access with action handling in a single chat interface.
 
-### System Flow
-
-1. A query is submitted through the chat interface
-2. Gemini classifies the intent (data, calendar, or general)
-3. The appropriate handler processes the request
-4. A structured response is returned
+1. **Intent Classification**: A query is submitted. Gemini determines if the user is asking a data question, a scheduling question, or a general question.
+2. **Data Execution (Sheets Handler)**: If it's a data question, the backend fetches live crowd metrics, runs an active validation scan (counting rows, checking for missing/duplicate values), and sends the audited data to Gemini for analysis.
+3. **Action Execution (Calendar Handler)**: If a bottleneck needs fixing, the user asks to schedule a deployment. The backend calls the Google Calendar API to create a real-world event and returns the link to the operations manager.
+4. **Resilience**: The system uses a round-robin API key rotation to ensure the assistant never crashes during a high-traffic event if a single API quota is reached.
 
 ```
 User Input
@@ -205,7 +192,7 @@ Virtual-PromptWars-H2S-001/
 
 ---
 
-## 📌 Assumptions
+## Any assumptions made
 
 - Google Sheet contains headers in the first row
 - Service account has access to the target spreadsheet
