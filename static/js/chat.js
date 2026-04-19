@@ -47,7 +47,7 @@ function appendMessage(role, text) {
     msgDiv.className = `message-group ${role}`;
     const formattedContent = formatResponse(text);
     msgDiv.innerHTML = `
-        <div class="msg-avatar">${role === 'assistant' ? ASSISTANT_ICON : '👤'}</div>
+        <div class="msg-avatar">${role === 'assistant' ? ASSISTANT_ICON : '🧑'}</div>
         <div class="msg-content">${formattedContent}</div>
     `;
     chatContainer.appendChild(msgDiv);
