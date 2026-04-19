@@ -29,6 +29,17 @@ def ensure_upload_dir():
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+def sanitize_input(text):
+    """Sanitize user input to prevent prompt injection and XSS."""
+    import re
+    # Strip HTML tags
+    text = re.sub(r'<[^>]+>', '', text)
+    # Limit length to prevent abuse
+    text = text[:500]
+    # Remove null bytes
+    text = text.replace('\x00', '')
+    return text.strip()
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -107,9 +118,12 @@ def reset_data():
 def chat():
     global _active_file
     
-    user_message = request.json.get('message')
+    user_message = request.json.get('message', '').strip()
     if not user_message:
         return jsonify({'error': 'No message provided'}), 400
+    
+    # Sanitize input before any processing
+    user_message = sanitize_input(user_message)
     
     if not os.getenv('GEMINI_API_KEY') and not os.getenv('GEMINI_API_KEYS'):
         return jsonify({'assistant': '⚠️ Setup Needed: Please add GEMINI_API_KEY to your Environment Variables.'}), 200
