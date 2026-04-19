@@ -13,6 +13,14 @@
 **Smart Venue Management & Operations Data Assistant**
 Designed to solve the problem of managing attendance, waiting times, and real-time coordination at large-scale venues (stadiums, conference centers, transit hubs).
 
+### Alignment with Theme
+
+| Hackathon Requirement | Your Solution's Feature | How it Addresses the Requirement |
+| :--- | :--- | :--- |
+| **Crowd Management** | Live Data Validation & Alerting | Reads crowd metrics from Google Sheets instantly to detect dangerous queue lengths. |
+| **Waiting Times** | Contextual Data QA | Ground staff queries ("longest wait time?") are answered in 1 second. |
+| **Real-time Coordination** | Calendar Deployment Hooks | Found a bottleneck? AI instantly schedules staff deployment via Calendar Event to fix it. |
+
 ---
 
 ## Approach and logic
