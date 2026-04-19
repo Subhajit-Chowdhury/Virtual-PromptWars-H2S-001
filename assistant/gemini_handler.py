@@ -3,7 +3,6 @@ import json
 import warnings
 import random
 import google.generativeai as genai
-from google.api_core import exceptions
 
 # Suppress the deprecation warnings for the competition preview
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -19,7 +18,7 @@ class GeminiHandler:
             self.api_keys = [single_key] if single_key else []
 
         if not self.api_keys:
-            raise ValueError("No Gemini API keys found. Please set GEMINI_API_KEY or GEMINI_API_KEYS.")
+            raise ValueError("No Gemini API keys found. Set GEMINI_API_KEY or GEMINI_API_KEYS.")
         
         # Round-robin starting point
         self.current_key_index = random.randint(0, len(self.api_keys) - 1)
@@ -46,36 +45,39 @@ class GeminiHandler:
         self.current_key_index = (self.current_key_index + 1) % len(self.api_keys)
         return self.api_keys[self.current_key_index]
 
-    def _call_model(self, prompt, is_intent=False):
+    def _call_model(self, prompt):
         """
-        Robustly calls the Gemini API with automatic key rotation and failover logic.
+        Calls the Gemini API with automatic key rotation and failover.
         """
         attempts = 0
         max_attempts = len(self.api_keys)
+        last_error = None
         
         while attempts < max_attempts:
             key = self._get_next_key()
             try:
                 genai.configure(api_key=key)
                 model = genai.GenerativeModel('gemini-1.5-flash-latest')
-                
                 response = model.generate_content(prompt)
                 return response.text
-                
-            except exceptions.ResourceExhausted:
-                print(f"⚠️ Key {attempts+1} exhausted (Quota). Rotating...")
-                attempts += 1
-                continue
             except Exception as e:
-                print(f"⚠️ Error with Key {attempts+1}: {str(e)}. Rotating...")
-                attempts += 1
-                continue
+                last_error = e
+                error_str = str(e).lower()
+                if 'quota' in error_str or 'resource' in error_str or '429' in error_str:
+                    print(f"Key {attempts+1} quota hit. Rotating...")
+                    attempts += 1
+                    continue
+                else:
+                    # Non-quota error — still try next key
+                    print(f"Key {attempts+1} error: {str(e)}. Rotating...")
+                    attempts += 1
+                    continue
         
-        raise exceptions.ResourceExhausted("All API keys in the pool have exceeded their quota. Please try again later.")
+        raise Exception(f"All {max_attempts} API keys exhausted. Last error: {str(last_error)}")
 
     def get_intent(self, message):
         prompt = f"{self.system_prompt}\n\nUser Message: {message}\n\nTask: Output ONLY one word: 'SHEETS', 'CALENDAR', or 'GENERAL'."
-        response_text = self._call_model(prompt, is_intent=True)
+        response_text = self._call_model(prompt)
         
         intent = response_text.strip().upper()
         intent = intent.replace("'", "").replace('"', "").replace("`", "")
