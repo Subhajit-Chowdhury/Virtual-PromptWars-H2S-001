@@ -24,7 +24,7 @@ The resulting "Antigravity Partner" eliminates context switching by providing ze
 ## 💡 Why This Assistant is Helpful (The Proof)
 1. **Real-Time Data Integrity**: Unlike a static chatbot, this assistant queries **live business data**. You can verify its responses by looking at your Google Sheet in real-time.
 2. **Automated Action**: It doesn't just "talk" about tasks; it **executes** them by creating real events in your Google Calendar.
-3. **Production Validation**: The system includes a **Data Quality Layer** that automatically detects nulls, duplicates, and mismatches, ensuring the AI never "hallucinates" based on broken data.
+3. **Data Quality Layer**: The system includes a robust validation layer that automatically detects nulls and duplicates, providing high-integrity context that **mitigates the risk of inaccurate reasoning** based on broken data sources.
 
 ---
 
