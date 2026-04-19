@@ -8,32 +8,29 @@
 
 ---
 
-## 🧩 Context
+## 📋 Problem Statement Alignment (Virtual: PromptWars)
 
-In many day-to-day workflows, data exploration and follow-up actions happen in different places.
+**The Challenge:** Design a solution that improves the physical event experience for attendees at large-scale venues (stadiums, conference centers, transit hubs) by addressing Crowd Management, Waiting Times, and Real-time Coordination.
 
-Data is reviewed in spreadsheets or files. Decisions and next steps are handled separately — in meetings, chats, or calendars.
+**The DataPulse Solution:**
+DataPulse is an AI-powered **Venue Operations Assistant**. At large-scale events, operational delays happen because crowd density data (gate traffic, wait times) sits in a dashboard, while team coordination happens in separate apps. 
 
-This separation introduces friction:
-
-- Context can become fragmented between tools
-- Small but important observations may not lead to immediate action
-- Follow-ups depend on manual coordination
-
-This project explores whether that gap can be reduced within a single workflow.
+DataPulse bridges this gap for ground teams:
+- **Crowd Management & Waiting Times:** It reads live crowd metrics and sensor data from Google Sheets, providing instant answers about queue lengths and gate congestion.
+- **Real-time Coordination:** When an operational bottleneck is found (e.g., "Gate B is overcrowded"), the operations manager can tell the AI to instantly create a calendar event to deploy staff, resolving the issue before it impacts attendee experience.
 
 ---
 
 ## 🎯 Objective
 
-Design a system that can:
+Design an operations system that can:
 
-- Read and analyze live data
-- Respond to questions in natural language
-- Enable immediate follow-up actions
-- Maintain data reliability through validation
+- Read and analyze live venue data
+- Respond to ground staff queries in natural language
+- Enable immediate real-time coordination (staff dispatch)
+- Maintain reliable crowd reports through data validation
 
-**Constraint:** All of the above should happen within a single interaction flow, without requiring users to switch between multiple tools.
+**Constraint:** Everything must happen within a single rapid-response chat interface to minimize operational latency at the venue.
 
 ---
 
