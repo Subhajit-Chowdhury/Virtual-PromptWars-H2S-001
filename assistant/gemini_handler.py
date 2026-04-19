@@ -57,7 +57,7 @@ class GeminiHandler:
             key = self._get_next_key()
             try:
                 genai.configure(api_key=key)
-                model = genai.GenerativeModel('gemini-1.5-flash-latest')
+                model = genai.GenerativeModel('gemini-2.0-flash')
                 response = model.generate_content(prompt)
                 return response.text
             except Exception as e:
