@@ -22,11 +22,11 @@ function appendMessage(role, text) {
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-async function sendMessage() {
-    const text = userInput.value.trim();
+async function sendMessage(customText = null) {
+    const text = customText || userInput.value.trim();
     if (!text) return;
 
-    userInput.value = '';
+    if (!customText) userInput.value = '';
     appendMessage('user', text);
 
     // Typing indicator
@@ -49,16 +49,21 @@ async function sendMessage() {
         if (data.assistant) {
             appendMessage('assistant', data.assistant);
         } else {
-            appendMessage('assistant', 'Sorry, I encountered an error.');
+            appendMessage('assistant', 'Oops, I had a little hiccup. Could you try that again?');
         }
     } catch (error) {
         chatContainer.removeChild(typingDiv);
-        appendMessage('assistant', 'Error connecting to the server.');
+        appendMessage('assistant', 'Sorry, I'm having trouble connecting to my brain right now! Please check your server.');
         console.error('Error:', error);
     }
 }
 
-sendBtn.addEventListener('click', sendMessage);
+// Global function to handle suggestion chips
+function handleSuggestion(text) {
+    sendMessage(text);
+}
+
+sendBtn.addEventListener('click', () => sendMessage());
 userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
 });

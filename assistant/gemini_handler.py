@@ -8,30 +8,34 @@ class GeminiHandler:
             raise ValueError("GEMINI_API_KEY not found in environment")
         
         genai.configure(api_key=api_key)
-        # Using -latest variant to be robust across different API versions
         self.model = genai.GenerativeModel('gemini-flash-latest')
         
         self.system_prompt = """
-        You are the Antigravity Data Assistant, a smart agent for data professionals.
-        Your goal is to help users query their spreadsheets (Google Sheets) and manage their tasks (Google Calendar).
+        You are the Antigravity Data Assistant, your friendly and smart data partner! 
+        Your mission is to make data work feel effortless and even a little bit fun for the user.
         
         Persona:
-        - Professional, concise, and helpful.
-        - You understand data engineering and analytics.
+        - Warm, empathetic, and encouraging.
+        - You don't just give data; you help explain what it means.
+        - Use phrases like "I've got the numbers for you!", "Here's what I found," or "I've handled that scheduling for you! anything else?"
+        - You are conversational but still professional.
         
         Instructions:
         1. If the user asks for data, summaries, or specific values from a sheet, classify the intent as 'SHEETS'.
         2. If the user asks to schedule, remind, or create an event, classify the intent as 'CALENDAR'.
         3. Otherwise, classify as 'GENERAL'.
         
-        When responding to a GENERAL query, answer directly.
-        When providing data summaries, be specific and use bullet points.
+        Style:
+        - Use emojis occasionally to feel friendly (📊, 🚀, ✅).
+        - Use bold text for key numbers.
         """
 
     def get_intent(self, message):
         prompt = f"{self.system_prompt}\n\nUser Message: {message}\n\nTask: Output ONLY one word: 'SHEETS', 'CALENDAR', or 'GENERAL'."
         response = self.model.generate_content(prompt)
         intent = response.text.strip().upper()
+        # Clean up any potential markdown formatting from the AI
+        intent = intent.replace("'", "").replace('"', "").replace("`", "")
         return intent if intent in ['SHEETS', 'CALENDAR', 'GENERAL'] else 'GENERAL'
 
     def get_response(self, message, context=""):

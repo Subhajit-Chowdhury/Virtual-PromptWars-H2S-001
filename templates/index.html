@@ -25,15 +25,21 @@
             <div class="message assistant">
                 <div class="avatar">🤖</div>
                 <div class="content">
-                    <p>Hello! I'm your **Antigravity Data Assistant**. I can help you summarize sales, query spreadsheets, or set reminders.</p>
-                    <p>Try asking: <em>"Summarize my sales sheet"</em> or <em>"What were the units sold in North region?"</em></p>
+                    <p>Hi there! 👋 I'm your **Antigravity Data Assistant**.</p>
+                    <p>I'm ready to help you crunch some numbers or manage your schedule. What's on your mind today?</p>
                 </div>
             </div>
         </main>
 
+        <div class="suggestions">
+            <button class="chip" onclick="handleSuggestion('Summarize my sales sheet')">📊 Summarize Data</button>
+            <button class="chip" onclick="handleSuggestion('Who is the top customer segment?')">👤 Top Segment</button>
+            <button class="chip" onclick="handleSuggestion('Set a reminder to review data at 5pm')">⏰ Set Reminder</button>
+        </div>
+
         <footer>
             <div class="input-wrapper">
-                <input type="text" id="user-input" placeholder="Ask about your data..." autocomplete="off">
+                <input type="text" id="user-input" placeholder="Type a message..." autocomplete="off">
                 <button id="send-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
