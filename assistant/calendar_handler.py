@@ -1,5 +1,6 @@
 import os
 import json
+import base64
 from datetime import datetime, timedelta
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -8,23 +9,25 @@ class CalendarHandler:
     def __init__(self):
         self.scopes = ['https://www.googleapis.com/auth/calendar']
         
-        # Production Secret Management: Support both file-based and ENV-based credentials
-        raw_creds_json = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
+        raw_creds = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
         self.creds_path = os.getenv('GOOGLE_CREDENTIALS_PATH')
         
-        if raw_creds_json:
+        if raw_creds:
             try:
-                # Clean up the JSON string (handles escaped newlines from Vercel)
-                clean_json = raw_creds_json.replace('\\n', '\n').strip()
-                if clean_json.startswith('"') and clean_json.endswith('"'):
-                    clean_json = clean_json[1:-1]
+                try:
+                    # 1. Try Base64
+                    decoded = base64.b64decode(raw_creds).decode('utf-8')
+                    info = json.loads(decoded)
+                except Exception:
+                    # 2. Fallback
+                    clean_json = raw_creds.replace('\\n', '\n').strip()
+                    if clean_json.startswith('"') and clean_json.endswith('"'):
+                        clean_json = clean_json[1:-1]
+                    info = json.loads(clean_json)
                 
-                info = json.loads(clean_json)
                 self.creds = service_account.Credentials.from_service_account_info(
                     info, scopes=self.scopes)
             except Exception as e:
-                # Silently fail if calendar is not the primary mission, 
-                # but log it for production debugging
                 print(f"Calendar Credential Error: {e}")
                 raise ValueError("Failed to load Calendar credentials")
         elif self.creds_path and os.path.exists(self.creds_path):

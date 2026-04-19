@@ -1,5 +1,6 @@
 import os
 import json
+import base64
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
@@ -8,28 +9,31 @@ class SheetsHandler:
         self.scopes = ['https://www.googleapis.com/auth/spreadsheets']
         self.spreadsheet_id = os.getenv('SPREADSHEET_ID')
         
-        # Production Secret Management: Support both file-based and ENV-based credentials
-        raw_creds_json = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
+        raw_creds = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
         self.creds_path = os.getenv('GOOGLE_CREDENTIALS_PATH')
         
-        if raw_creds_json:
+        if raw_creds:
             try:
-                # Clean up the JSON string (handles escaped newlines from Vercel)
-                clean_json = raw_creds_json.replace('\\n', '\n').strip()
-                # If the user accidentally wrapped the whole thing in quotes, strip them
-                if clean_json.startswith('"') and clean_json.endswith('"'):
-                    clean_json = clean_json[1:-1]
+                # 1. Try decoding as Base64 (The most reliable cloud method)
+                try:
+                    decoded = base64.b64decode(raw_creds).decode('utf-8')
+                    info = json.loads(decoded)
+                except Exception:
+                    # 2. Fallback: Treat as raw JSON and fix common formatting issues
+                    clean_json = raw_creds.replace('\\n', '\n').strip()
+                    if clean_json.startswith('"') and clean_json.endswith('"'):
+                        clean_json = clean_json[1:-1]
+                    info = json.loads(clean_json)
                 
-                info = json.loads(clean_json)
                 self.creds = service_account.Credentials.from_service_account_info(
                     info, scopes=self.scopes)
             except Exception as e:
-                raise ValueError(f"CRITICAL: Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON. Please ensure it is a valid JSON string. Detail: {str(e)}")
+                raise ValueError(f"CRITICAL: Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON. Detail: {str(e)}")
         elif self.creds_path and os.path.exists(self.creds_path):
             self.creds = service_account.Credentials.from_service_account_file(
                 self.creds_path, scopes=self.scopes)
         else:
-            raise FileNotFoundError("No Google credentials found (Check GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_CREDENTIALS_PATH)")
+            raise FileNotFoundError("No Google credentials found")
             
         self.service = build('sheets', 'v4', credentials=self.creds)
 
