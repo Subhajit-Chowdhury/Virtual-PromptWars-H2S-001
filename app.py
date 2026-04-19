@@ -2,27 +2,30 @@ import os
 from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 
+# Load .env (Local development)
+load_dotenv()
+
 # Import our custom handlers
 from assistant.gemini_handler import GeminiHandler
 from assistant.sheets_handler import SheetsHandler
 from assistant.calendar_handler import CalendarHandler
 
-load_dotenv()
-
 app = Flask(__name__)
 
-# Initialize handlers
-try:
-    gemini = GeminiHandler()
-    sheets = SheetsHandler()
-    calendar = CalendarHandler()
-except Exception as e:
-    # Error logged for production diagnosis
-    print(f"Server Startup Log: Handlers initialized: {e}")
+# Lazy initialization to prevent Vercel crash on startup if ENVs are missing
+def get_handlers():
+    try:
+        return GeminiHandler(), SheetsHandler(), CalendarHandler()
+    except Exception as e:
+        return None, str(e)
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/health')
+def health():
+    return jsonify({"status": "healthy"}), 200
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -30,7 +33,16 @@ def chat():
     if not user_message:
         return jsonify({'error': 'No message provided'}), 400
     
+    # Check if we have credentials (Production check)
+    gemini, s_h, c_h = None, None, None
+    if not os.getenv('GEMINI_API_KEY'):
+        return jsonify({'assistant': '⚠️ Vercel Setup Needed: Please add your GEMINI_API_KEY to Environment Variables.'}), 200
+        
     try:
+        gemini = GeminiHandler()
+        sheets = SheetsHandler()
+        calendar = CalendarHandler()
+        
         # Step 1: Detect Intent
         intent = gemini.get_intent(user_message)
         
@@ -43,7 +55,6 @@ def chat():
             response_text = gemini.get_response(user_message, context=f"SHEET_DATA:\n{context}")
         
         elif intent == 'CALENDAR':
-            # Create a simple reminder based on user message
             result = calendar.create_reminder(summary=user_message)
             response_text = f"I've updated your schedule. {result}"
         
@@ -57,11 +68,10 @@ def chat():
 
     except Exception as e:
         return jsonify({
-            'assistant': f"I ran into a technical glitch: {str(e)}",
+            'assistant': f"⚠️ Deployment Check: I can't connect to Google Services. Did you add GOOGLE_SERVICE_ACCOUNT_JSON and SPREADSHEET_ID to Vercel? (Error: {str(e)})",
             'error': str(e)
-        }), 500
+        }), 200 # Return 200 so the UI can show the helpful error
 
 if __name__ == '__main__':
-    # Production-ready serving (Debug=False)
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
