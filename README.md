@@ -1,162 +1,169 @@
 # 📊 DataPulse Assistant
 
-**Your data shouldn't just sit in a spreadsheet. It should talk to you.**
+> **Your data shouldn't just sit in a spreadsheet. It should talk to you.**
 
-DataPulse is an AI-powered assistant that reads your Google Sheets, answers your questions in plain English, and even schedules follow-up reminders on your Google Calendar — all from a single chat interface.
-
-No more switching tabs. No more building pivot tables. Just ask.
-
----
-
-## 🤔 The Problem We're Solving
-
-If you've ever worked with business data, you know the drill:
-
-1. Open Google Sheets. Scroll. Filter. Squint at numbers.
-2. Try to figure out what's actually going on.
-3. Switch to Calendar to schedule a follow-up meeting.
-4. Forget what you just found because you lost context.
-
-This cycle — **"Insight Decay"** — is incredibly common. The gap between *finding* something important in your data and *acting* on it is where opportunities get lost.
-
-We built DataPulse to close that gap.
+🔗 **Live Demo**: [virtual-prompt-wars-h2s-001.vercel.app](https://virtual-prompt-wars-h2s-001.vercel.app)
+📁 **GitHub**: [github.com/SubhajitSK/Virtual-PromptWars-H2S-001](https://github.com/SubhajitSK/Virtual-PromptWars-H2S-001)
+👤 **Built by**: Subhajit | AWS Data Engineer
 
 ---
 
-## ✅ What DataPulse Actually Does
+## 🤔 The Problem
 
-| Feature | What it means for you |
+Every analyst knows this pain:
+
+You open Google Sheets. You scroll. You filter. You squint at numbers — and by the time you've figured out what's going on, you've already forgotten why you opened the tab in the first place. Then you switch to Google Calendar to schedule a follow-up, and by then you've lost context completely.
+
+This constant **"context-switching"** is where valuable insights go to die. The gap between *finding* something important in your data and *acting* on it is where business opportunities get missed every single day.
+
+---
+
+## 💡 What DataPulse Does About It
+
+DataPulse is a conversational AI assistant that plugs directly into your Google Sheets and Google Calendar. Instead of switching tools and losing context, you just **ask a question in plain English** and get a clear, accurate answer back — instantly.
+
+It bridges the gap between **data insight** and **real action**, in one chat window.
+
+Here's what that looks like in practice:
+
+| What you type | What DataPulse does |
 | :--- | :--- |
-| **Ask questions in plain English** | Type "What's our top region?" instead of writing formulas. |
-| **Live data, always** | Every answer comes from your actual Google Sheet — not a cached copy. |
-| **Data quality checks** | Before answering, it scans for nulls, duplicates, and format issues automatically. |
-| **Schedule follow-ups** | Say "Remind me to review Q1 sales" and it creates a real Google Calendar event. |
-| **Typo-tolerant** | Misspell your question? No problem. It understands what you meant. |
+| *"What is our top-selling region?"* | Reads your live sheet, runs a quality check, and gives you a clear answer with numbers. |
+| *"Show me a breakdown of Q1 revenue"* | Generates a clean, sorted table directly in the chat. |
+| *"Remind me to review sales data on Friday"* | Creates a real Google Calendar event and sends you the link. |
+| *"Whch prodct had the hihgest margins?"* (typos and all) | Understands what you meant and answers correctly — no judgment. |
+| *(Upload a CSV or Excel file)* | Instantly analyzes your custom dataset the same way it does with Google Sheets. |
 
 ---
 
-## 🛠️ How We Built It
+## 🏗️ How It Was Built
 
-We kept the architecture simple and modular on purpose — every piece can be swapped or scaled independently.
+The architecture is deliberately modular. Every component can be swapped or scaled without touching the rest.
 
 ```
-User (Chat UI)
-    ↓
-Flask Backend (app.py)
-    ↓
-Gemini AI → Classifies intent (Is this a data question? A calendar request? General chat?)
-    ↓
-┌─────────────────┐    ┌──────────────────┐
-│  Sheets Handler  │    │ Calendar Handler  │
-│  (Live data +    │    │ (Creates real     │
-│   quality check) │    │  calendar events) │
-└─────────────────┘    └──────────────────┘
+You (Chat Interface)
+        ↓
+  Flask Backend
+        ↓
+  Gemini AI Brain → Classifies your message (Data? Calendar? General?)
+        ↓
+  ┌──────────────────┐    ┌────────────────────┐
+  │  Sheets Handler  │    │  Calendar Handler  │
+  │  • Reads sheet   │    │  • Creates events  │
+  │  • Audits data   │    │  • Returns links   │
+  └──────────────────┘    └────────────────────┘
 ```
 
-**Tech stack:**
+**Tech Stack:**
 - **Backend**: Python + Flask
-- **AI Brain**: Google Gemini 1.5 Flash
-- **Data Source**: Google Sheets API (live reads)
-- **Action Layer**: Google Calendar API (real event creation)
-- **Frontend**: Vanilla HTML/CSS/JS with a responsive "Modern Classic" dark theme
+- **AI**: Google Gemini 1.5 Flash (with Multi-Agent key rotation for resilience)
+- **Data**: Google Sheets API (live reads) + Local file uploads (CSV, XLSX, JSON)
+- **Actions**: Google Calendar API (real events, not simulations)
+- **Frontend**: Vanilla HTML/CSS/JS — dark-themed, fully responsive
 
 ---
 
-## 🔍 Under the Hood (Developer Notes)
+## 🔍 What's Happening Under the Hood
 
-Here's what's happening behind the scenes that you *won't* see in the UI — but matters a lot.
+These are the non-obvious engineering decisions that make DataPulse more than just "a chatbot that reads a spreadsheet."
 
-### Intent Classification
-When a user sends a message, Gemini doesn't just "chat." It first classifies the message into one of three buckets: `SHEETS`, `CALENDAR`, or `GENERAL`. This determines which handler processes the request. It's a simple routing trick, but it keeps the logic clean and predictable.
+### Intent Router
+Every message is classified *before* it's answered. Gemini first determines: is this a **data question**, a **calendar request**, or a **general question**? This keeps responses accurate and prevents the AI from guessing.
 
-### Data Integrity Layer
-Before the AI ever sees your spreadsheet data, the `SheetsHandler` runs a validation pass. It checks for:
-- **Null/empty cells** that could skew analysis
-- **Duplicate rows** that could inflate numbers
+### Data Integrity Auditor
+Before the AI ever sees your data, a validation pass runs automatically. It checks for:
+- **Empty cells** — so the AI isn't reasoning on incomplete rows
+- **Duplicate entries** — so numbers aren't inflated
 
-The AI receives a quality report *alongside* the raw data. This means it can warn you: "Hey, I found 3 duplicate rows — you might want to clean those up before making decisions."
+The AI then receives a quality report *alongside* the data. This means it can proactively flag issues: *"I found 2 duplicate rows in your dataset — your totals may be slightly off."* This is what makes DataPulse trustworthy, not just fast.
 
-### Credential Handling (Cloud-Ready)
-We support two modes:
-- **Local development**: Point to a `service_account.json` file via `GOOGLE_CREDENTIALS_PATH`
-- **Cloud deployment (Vercel)**: Paste the JSON as a Base64-encoded string in `GOOGLE_SERVICE_ACCOUNT_JSON`
+### Universal File Analyzer
+Users can upload their own `.csv`, `.xlsx`, or `.json` files directly in the chat. The assistant seamlessly switches to analyzing that file — and runs the same audit on it. One click on **Reset** switches it back to the live Google Sheet.
 
-The handler auto-detects which format you're using. No config flags needed.
+### Multi-Agent API Pool
+Instead of relying on a single API key (which can hit rate limits), DataPulse supports a **pool of Gemini API keys** via `GEMINI_API_KEYS`. It rotates through them using a round-robin strategy, and automatically fails over to the next key if one is exhausted. The user never sees an error.
 
-### Dynamic Sheet Detection
-We never hardcode the sheet tab name. The handler queries the spreadsheet metadata and reads from the first available tab. Rename your tabs anytime — nothing breaks.
+### Cloud-Safe Credential Handling
+We support two modes, detected automatically:
+- **Local**: Use a `service_account.json` file path via `GOOGLE_CREDENTIALS_PATH`
+- **Cloud (Vercel)**: Paste a Base64-encoded version of the JSON in `GOOGLE_SERVICE_ACCOUNT_JSON`
+
+No flags. No config files to change. It just works in both environments.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started Locally
 
-### Prerequisites
-- Python 3.10 or higher
+**What you need before you begin:**
+- Python 3.10+
 - A Google Cloud project with **Sheets API** and **Calendar API** enabled
 - A **Gemini API key** from [Google AI Studio](https://aistudio.google.com/)
-- A **Service Account** with access to your Google Sheet
+- A **Service Account** JSON with read access to your Google Sheet
 
-### Quick Setup
+**Steps:**
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/your-username/Virtual-PromptWars-H2S-001.git
+# Step 1: Clone the repository
+git clone https://github.com/SubhajitSK/Virtual-PromptWars-H2S-001.git
 cd Virtual-PromptWars-H2S-001
 
-# 2. Install dependencies
+# Step 2: Install dependencies
 pip install -r requirements.txt
 
-# 3. Create your .env file
+# Step 3: Set up your environment variables
+# Create a file named .env in the root folder and paste this:
 GEMINI_API_KEY=your_gemini_key_here
-SPREADSHEET_ID=your_sheet_id_here
+SPREADSHEET_ID=your_google_sheet_id_here
 GOOGLE_CREDENTIALS_PATH=service_account.json
 
-# 4. Run it
+# Step 4: Run the app
 python app.py
 ```
 
-Open `http://localhost:5000` and start asking questions.
+Open your browser and go to `http://localhost:5000`. Start asking questions.
 
 ---
 
-## 🌐 Deploying to Vercel
+## ☁️ Deploying to Vercel
 
-1. Push your repo to GitHub.
-2. Import the project into [Vercel](https://vercel.com).
-3. Add these **Environment Variables** in Vercel Settings:
-   - `GEMINI_API_KEY` → Your Gemini key
-   - `SPREADSHEET_ID` → Your Google Sheet ID
-   - `GOOGLE_SERVICE_ACCOUNT_JSON` → Base64-encoded service account JSON
-4. Deploy. That's it.
+1. Push your code to GitHub.
+2. Go to [Vercel](https://vercel.com) and import your repository.
+3. In **Settings → Environment Variables**, add the following:
 
-> **Tip**: To get the Base64 string, run this in PowerShell:
+   | Variable Name | What to put there |
+   | :--- | :--- |
+   | `GEMINI_API_KEY` | Your Gemini API key |
+   | `SPREADSHEET_ID` | The ID from your Google Sheet URL |
+   | `GOOGLE_SERVICE_ACCOUNT_JSON` | Your service account JSON as a Base64 string |
+
+4. Click **Deploy**.
+
+> **Getting the Base64 string (Windows PowerShell):**
 > ```powershell
 > [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes((Get-Content service_account.json -Raw)))
 > ```
+> Copy the output and paste it as the value for `GOOGLE_SERVICE_ACCOUNT_JSON`.
 
 ---
 
-## 🎯 Why This Matters
+## 🌐 Google Services Used
 
-Most AI demos show you a chatbot that *talks* about data.
-
-DataPulse is different because it **acts** on data:
-- It reads live spreadsheets (not pre-loaded samples).
-- It validates data quality before reasoning (so it doesn't make things up).
-- It creates real calendar events (so insights don't get forgotten).
-
-**The goal isn't just intelligence — it's accountability.**
-
----
-
-## 📋 Google Services Used
-
-| Service | Role |
+| Service | What it does in DataPulse |
 | :--- | :--- |
-| Google Gemini API | Natural language understanding and reasoning |
-| Google Sheets API | Live data retrieval and validation |
-| Google Calendar API | Automated scheduling and reminder creation |
+| **Google Gemini API** | Powers the AI brain — understands questions, classifies intent, generates answers |
+| **Google Sheets API** | Fetches live data from your spreadsheet for every query |
+| **Google Calendar API** | Creates real calendar reminders from natural language commands |
 
 ---
 
-*Built for the Virtual: PromptWars*
+## 📋 About the Project
+
+This project was built for the **Virtual: PromptWars** competition — a challenge to build a useful, production-grade AI assistant powered by Google services.
+
+The goal was simple: build something that a real operations or analytics team could use on Monday morning, not just a demo that works in ideal conditions.
+
+**The core belief behind DataPulse**: AI becomes genuinely useful when it bridges the gap between *insight* and *action*. Seeing data is not enough. Acting on it — immediately, correctly, and without losing context — is what counts.
+
+---
+
+*Built with ☕ by [Subhajit](https://github.com/SubhajitSK) · AWS Data Engineer*
