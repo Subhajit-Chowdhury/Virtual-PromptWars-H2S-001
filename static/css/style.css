@@ -231,13 +231,28 @@ button#send-btn {
     background: var(--accent-color);
     color: white;
     border: none;
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+
+button#send-btn:hover {
+    background: #1a73e8;
+}
+
+button#send-btn:active {
+    transform: scale(0.92);
+}
+
+button#send-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 3;
 }
 
 .legal-text {
