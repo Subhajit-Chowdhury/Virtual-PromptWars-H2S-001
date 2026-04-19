@@ -57,6 +57,9 @@ body {
 .brand {
     display: flex;
     flex-direction: column;
+    text-decoration: none;
+    cursor: pointer;
+    color: inherit;
 }
 
 .logo-text {
