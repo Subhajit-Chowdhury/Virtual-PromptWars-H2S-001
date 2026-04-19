@@ -9,16 +9,23 @@ class SheetsHandler:
         self.spreadsheet_id = os.getenv('SPREADSHEET_ID')
         
         # Production Secret Management: Support both file-based and ENV-based credentials
-        creds_json = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
+        raw_creds_json = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
         self.creds_path = os.getenv('GOOGLE_CREDENTIALS_PATH')
         
-        if creds_json:
-            # Load directly from ENV (Best for Vercel/Cloud)
-            info = json.loads(creds_json)
-            self.creds = service_account.Credentials.from_service_account_info(
-                info, scopes=self.scopes)
+        if raw_creds_json:
+            try:
+                # Clean up the JSON string (handles escaped newlines from Vercel)
+                clean_json = raw_creds_json.replace('\\n', '\n').strip()
+                # If the user accidentally wrapped the whole thing in quotes, strip them
+                if clean_json.startswith('"') and clean_json.endswith('"'):
+                    clean_json = clean_json[1:-1]
+                
+                info = json.loads(clean_json)
+                self.creds = service_account.Credentials.from_service_account_info(
+                    info, scopes=self.scopes)
+            except Exception as e:
+                raise ValueError(f"CRITICAL: Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON. Please ensure it is a valid JSON string. Detail: {str(e)}")
         elif self.creds_path and os.path.exists(self.creds_path):
-            # Load from file (Best for Local)
             self.creds = service_account.Credentials.from_service_account_file(
                 self.creds_path, scopes=self.scopes)
         else:

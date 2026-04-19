@@ -9,13 +9,24 @@ class CalendarHandler:
         self.scopes = ['https://www.googleapis.com/auth/calendar']
         
         # Production Secret Management: Support both file-based and ENV-based credentials
-        creds_json = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
+        raw_creds_json = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
         self.creds_path = os.getenv('GOOGLE_CREDENTIALS_PATH')
         
-        if creds_json:
-            info = json.loads(creds_json)
-            self.creds = service_account.Credentials.from_service_account_info(
-                info, scopes=self.scopes)
+        if raw_creds_json:
+            try:
+                # Clean up the JSON string (handles escaped newlines from Vercel)
+                clean_json = raw_creds_json.replace('\\n', '\n').strip()
+                if clean_json.startswith('"') and clean_json.endswith('"'):
+                    clean_json = clean_json[1:-1]
+                
+                info = json.loads(clean_json)
+                self.creds = service_account.Credentials.from_service_account_info(
+                    info, scopes=self.scopes)
+            except Exception as e:
+                # Silently fail if calendar is not the primary mission, 
+                # but log it for production debugging
+                print(f"Calendar Credential Error: {e}")
+                raise ValueError("Failed to load Calendar credentials")
         elif self.creds_path and os.path.exists(self.creds_path):
             self.creds = service_account.Credentials.from_service_account_file(
                 self.creds_path, scopes=self.scopes)
