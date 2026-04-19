@@ -171,11 +171,28 @@ Open `http://localhost:5000` in your browser. Start asking questions.
 
 ## 🧪 Testing
 
-The application can be tested in three ways:
+**Automated tests** — run the full suite with:
 
-1. **Live testing**: Visit the [deployed app](https://virtual-prompt-wars-h2s-001.vercel.app) and type a data question.
-2. **File upload testing**: Click the 📎 icon, upload any CSV or Excel file, and ask questions about it.
-3. **Local testing**: Run `python app.py` and open `http://localhost:5000`.
+```bash
+python -m pytest tests/test_handlers.py -v
+```
+
+The test suite covers **22 tests** across 4 categories:
+
+| Category | Tests | What it validates |
+| :--- | :--- | :--- |
+| Input Sanitization | 5 | HTML stripping, length limits, null byte removal |
+| File Validation | 8 | Allowed/rejected extensions, edge cases |
+| Flask Routes | 6 | Homepage, health check, chat, upload, reset |
+| Handler Imports | 3 | All modules load without credential errors |
+
+All tests pass without API credentials, making them safe to run in any environment.
+
+**Manual testing:**
+
+1. **Live**: Visit the [deployed app](https://virtual-prompt-wars-h2s-001.vercel.app) and type a data question.
+2. **File upload**: Click the 📎 icon, upload any CSV or Excel file, and ask questions about it.
+3. **Local**: Run `python app.py` and open `http://localhost:5000`.
 
 ---
 
