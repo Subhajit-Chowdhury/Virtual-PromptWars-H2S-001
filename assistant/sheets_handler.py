@@ -1,93 +1,83 @@
 import os
 import json
 import base64
+import pandas as pd
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
 class SheetsHandler:
     def __init__(self):
-        self.scopes = ['https://www.googleapis.com/auth/spreadsheets']
-        self.spreadsheet_id = os.getenv('SPREADSHEET_ID')
-        
-        raw_creds = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
-        self.creds_path = os.getenv('GOOGLE_CREDENTIALS_PATH')
-        
-        if raw_creds:
-            try:
-                # 1. Try decoding as Base64 (The most reliable cloud method)
-                try:
-                    decoded = base64.b64decode(raw_creds).decode('utf-8')
-                    info = json.loads(decoded)
-                except Exception:
-                    # 2. Fallback: Treat as raw JSON and fix common formatting issues
-                    clean_json = raw_creds.replace('\\n', '\n').strip()
-                    if clean_json.startswith('"') and clean_json.endswith('"'):
-                        clean_json = clean_json[1:-1]
-                    info = json.loads(clean_json)
-                
-                self.creds = service_account.Credentials.from_service_account_info(
-                    info, scopes=self.scopes)
-            except Exception as e:
-                raise ValueError(f"CRITICAL: Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON. Detail: {str(e)}")
-        elif self.creds_path and os.path.exists(self.creds_path):
-            self.creds = service_account.Credentials.from_service_account_file(
-                self.creds_path, scopes=self.scopes)
-        else:
-            raise FileNotFoundError("No Google credentials found")
-            
+        self.scopes = ['https://www.googleapis.com/auth/spreadsheets.readonly']
+        self.service_account_json = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
+        self.credentials_path = os.getenv('GOOGLE_CREDENTIALS_PATH')
+        self.creds = self._load_credentials()
         self.service = build('sheets', 'v4', credentials=self.creds)
 
-    def validate_data(self, values):
-        """Production-grade data quality check (Nulls, Duplicates)."""
-        if not values or len(values) < 2:
-            return "DATA_ERROR: Empty or insufficient data."
-        
-        headers = values[0]
-        rows = values[1:]
-        
-        report = []
-        null_count = 0
-        duplicate_count = 0
-        seen_rows = set()
-        
-        for row in rows:
-            if any(not str(cell).strip() for cell in row):
-                null_count += 1
-            
-            row_tuple = tuple(row)
-            if row_tuple in seen_rows:
-                duplicate_count += 1
-            seen_rows.add(row_tuple)
-            
-        if null_count > 0:
-            report.append(f"QUALITY_ALERT: Found {null_count} rows with empty values.")
-        if duplicate_count > 0:
-            report.append(f"QUALITY_ALERT: Found {duplicate_count} duplicate rows.")
-            
-        return " | ".join(report) if report else "DATA_QUALITY: High Integrity (0 errors detected)."
+    def _load_credentials(self):
+        # 1. Try loading from Base64 (Production/Vercel strategy)
+        if self.service_account_json:
+            try:
+                decoded_json = base64.b64decode(self.service_account_json).decode('utf-8')
+                creds_info = json.loads(decoded_json)
+                return service_account.Credentials.from_service_account_info(creds_info, scopes=self.scopes)
+            except Exception as e:
+                print(f"CRITICAL: Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON. Detail: {e}")
 
-    def get_sheet_data(self):
-        """Fetches and validates data from the first tab of the spreadsheet."""
+        # 2. Try loading from local file (Local dev strategy)
+        if self.credentials_path and os.path.exists(self.credentials_path):
+            return service_account.Credentials.from_service_account_file(self.credentials_path, scopes=self.scopes)
+        
+        raise ValueError("No Google credentials found (Check GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_CREDENTIALS_PATH)")
+
+    def get_sheet_data(self, spreadsheet_id):
         try:
-            spreadsheet = self.service.spreadsheets().get(spreadsheetId=self.spreadsheet_id).execute()
-            sheet_name = spreadsheet['sheets'][0]['properties']['title']
+            # Dynamically get the first sheet name to be resilient to tab renaming
+            sheet_metadata = self.service.spreadsheets().get(spreadsheetId=spreadsheet_id).execute()
+            sheets = sheet_metadata.get('sheets', '')
+            if not sheets:
+                return "No sheets found in spreadsheet.", {}
             
-            range_name = f"{sheet_name}!A1:H100"
-            result = self.service.spreadsheets().values().get(spreadsheetId=self.spreadsheet_id,
-                                        range=range_name).execute()
+            first_sheet_name = sheets[0].get("properties", {}).get("title", "Sheet1")
+            
+            result = self.service.spreadsheets().values().get(
+                spreadsheetId=spreadsheet_id, 
+                range=f"'{first_sheet_name}'!A1:Z100"
+            ).execute()
+            
             values = result.get('values', [])
-            
             if not values:
-                return "No data found."
+                return "Empty spreadsheet.", {}
+
+            # Convert to DataFrame for robust analysis
+            df = pd.DataFrame(values[1:], columns=values[0])
             
-            quality_report = self.validate_data(values)
-            data_str = f"QUALITY_REPORT: {quality_report}\n\n"
-            headers = values[0]
-            for row in values[1:]:
-                padded_row = row + [""] * (len(headers) - len(row))
-                row_data = [f"{headers[i]}: {padded_row[i]}" for i in range(len(headers))]
-                data_str += " | ".join(row_data) + "\n"
+            # Step 1: Perform Audit
+            cleaned_df, audit_report = self.validate_data(df)
             
-            return data_str
+            return cleaned_df.to_string(index=False), audit_report
         except Exception as e:
-            return f"Error accessing Sheets: {str(e)}"
+            return f"Error accessing Sheets: {str(e)}", {}
+
+    def validate_data(self, df):
+        """
+        Performs a data integrity audit on the provided dataframe.
+        """
+        initial_row_count = len(df)
+        
+        # 1. Detect Duplicates
+        duplicate_count = df.duplicated().sum()
+        df_no_dupes = df.drop_duplicates()
+        
+        # 2. Detect Nulls
+        null_count = df_no_dupes.isnull().sum().sum() + (df_no_dupes == "").sum().sum()
+        # Fill nulls with 'N/A' so the AI doesn't hallucinate missing values
+        final_df = df_no_dupes.replace("", "N/A").fillna("N/A")
+        
+        audit_report = {
+            "rows_checked": initial_row_count,
+            "duplicates_found": int(duplicate_count),
+            "null_values": int(null_count),
+            "is_healthy": duplicate_count == 0 and null_count == 0
+        }
+        
+        return final_df, audit_report

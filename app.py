@@ -12,13 +12,6 @@ from assistant.calendar_handler import CalendarHandler
 
 app = Flask(__name__)
 
-# Lazy initialization to prevent Vercel crash on startup if ENVs are missing
-def get_handlers():
-    try:
-        return GeminiHandler(), SheetsHandler(), CalendarHandler()
-    except Exception as e:
-        return None, str(e)
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -34,7 +27,6 @@ def chat():
         return jsonify({'error': 'No message provided'}), 400
     
     # Check if we have credentials (Production check)
-    gemini, s_h, c_h = None, None, None
     if not os.getenv('GEMINI_API_KEY'):
         return jsonify({'assistant': '⚠️ Vercel Setup Needed: Please add your GEMINI_API_KEY to Environment Variables.'}), 200
         
@@ -46,13 +38,16 @@ def chat():
         # Step 1: Detect Intent
         intent = gemini.get_intent(user_message)
         
-        context = ""
         response_text = ""
 
-        # Step 2: Fetch data if needed based on intent
+        # Step 2: Fetch data or execute action
         if intent == 'SHEETS':
-            context = sheets.get_sheet_data()
-            response_text = gemini.get_response(user_message, context=f"SHEET_DATA:\n{context}")
+            spreadsheet_id = os.getenv('SPREADSHEET_ID')
+            data, audit_report = sheets.get_sheet_data(spreadsheet_id)
+            
+            # Pass BOTH data and audit logic to AI
+            context = f"AUDIT_REPORT: {json.dumps(audit_report)}\nSHEET_DATA:\n{data}"
+            response_text = gemini.get_response(user_message, context=context)
         
         elif intent == 'CALENDAR':
             result = calendar.create_reminder(summary=user_message)
@@ -70,7 +65,7 @@ def chat():
         return jsonify({
             'assistant': f"⚠️ Deployment Check: I can't connect to Google Services. Did you add GOOGLE_SERVICE_ACCOUNT_JSON and SPREADSHEET_ID to Vercel? (Error: {str(e)})",
             'error': str(e)
-        }), 200 # Return 200 so the UI can show the helpful error
+        }), 200
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
