@@ -142,11 +142,7 @@ header .logo {
     gap: 0.75rem;
     padding: 1rem 2rem;
     overflow-x: auto;
-    scrollbar-width: none; /* Hide scrollbar for clean look */
-}
-
-.suggestions::-webkit-scrollbar {
-    display: none;
+    scrollbar-width: none;
 }
 
 .chip {
@@ -183,11 +179,6 @@ footer {
     transition: all 0.3s ease;
 }
 
-.input-wrapper:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 20px rgba(66, 133, 244, 0.15);
-}
-
 input {
     flex: 1;
     background: transparent;
@@ -209,84 +200,44 @@ button[id="send-btn"] {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform 0.2s ease;
 }
 
-button[id="send-btn"]:hover {
-    transform: scale(1.05);
+/* Skeleton Loading Animation */
+@keyframes shimmer {
+    0% { background-position: -468px 0; }
+    100% { background-position: 468px 0; }
 }
 
-.footer-note {
-    text-align: center;
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    margin-top: 1rem;
+.skeleton {
+    height: 12px;
+    margin: 8px 0;
+    border-radius: 4px;
+    background: #1e252d;
+    background-image: linear-gradient(to right, #1e252d 0%, #2a3441 20%, #1e252d 40%, #1e252d 100%);
+    background-repeat: no-repeat;
+    background-size: 800px 104px;
+    display: inline-block;
+    position: relative;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-name: shimmer;
+    animation-timing-function: linear;
 }
 
-/* --- Responsive Design (Mobile & Tablet) --- */
+.sk-1 { width: 140px; }
+.sk-2 { width: 220px; }
+.sk-3 { width: 180px; }
 
+/* Responsive */
 @media (max-width: 768px) {
-    .app-container {
-        border: none;
-        max-width: 100%;
-    }
-
-    header {
-        padding: 1rem 1.5rem;
-    }
-
-    .gradient-text {
-        font-size: 1.25rem;
-    }
-
-    .status-badge {
-        display: none; /* Hide for more space on mobile */
-    }
-
-    #chat-container {
-        padding: 1.5rem 1rem;
-    }
-
-    .message {
-        max-width: 90%;
-    }
-
-    .suggestions {
-        padding: 0.75rem 1rem;
-    }
-
-    footer {
-        padding: 1rem 1rem 1.5rem;
-    }
+    .app-container { border: none; }
+    .status-badge { display: none; }
 }
 
-@media (max-width: 480px) {
-    .avatar {
-        width: 32px;
-        height: 32px;
-    }
-
-    .content {
-        padding: 0.75rem 1rem;
-        font-size: 0.9rem;
-    }
-
-    .chip {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
-    }
-
-    input {
-        font-size: 0.9rem;
-    }
-}
-
-/* Animations */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-.message {
-    animation: fadeIn 0.3s ease forwards;
-}
+.message { animation: fadeIn 0.3s ease forwards; }
