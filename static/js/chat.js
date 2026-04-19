@@ -59,7 +59,7 @@ async function sendMessage(customText = null) {
         }
     } catch (error) {
         if (chatContainer.contains(typingDiv)) chatContainer.removeChild(typingDiv);
-        appendMessage('assistant', 'I'm having trouble connecting to my brain! Please check your Vercel Environment Variables (GEMINI_API_KEY, SPREADSHEET_ID, etc).');
+        appendMessage('assistant', "I'm having trouble connecting to my brain! Please check your Vercel Environment Variables (GEMINI_API_KEY, SPREADSHEET_ID, etc).");
         console.error('Error:', error);
     }
 }
