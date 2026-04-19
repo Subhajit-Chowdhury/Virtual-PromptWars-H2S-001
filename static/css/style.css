@@ -307,13 +307,64 @@ button#send-btn:active { transform: scale(0.92); }
 .sk-2 { width: 100%; }
 .sk-3 { width: 50%; }
 
-/* Desktop Tweaks */
+/* ────────────────────────────────────────────
+   Responsive: Small Phones (≤380px)
+   ──────────────────────────────────────────── */
+@media (max-width: 380px) {
+    .app-header { padding: 0.75rem 0.75rem; }
+    .logo-text { font-size: 1rem; }
+    .tagline { font-size: 0.55rem; }
+    .header-actions { gap: 0.4rem; }
+    .reset-pill span:last-child { display: none; } /* Hide "Reset" text, keep icon */
+    .status-pill, .reset-pill { font-size: 0.6rem; padding: 0.25rem 0.5rem; }
+    #chat-window { padding: 1rem 0.6rem; gap: 1rem; }
+    .message-group { max-width: 92%; gap: 0.5rem; }
+    .msg-avatar { width: 26px; height: 26px; font-size: 0.8rem; }
+    .msg-content { padding: 0.6rem 0.8rem; font-size: 0.85rem; }
+    .controls { padding: 0.5rem 0.6rem 1rem; }
+    .quick-actions { gap: 0.35rem; margin-bottom: 0.6rem; }
+    .action-chip { font-size: 0.65rem; padding: 0.3rem 0.6rem; }
+    .input-area { padding: 0.3rem; }
+    input[type="text"] { font-size: 0.85rem; padding: 0.4rem 0.5rem; }
+    #attach-btn { width: 32px; height: 32px; }
+    button#send-btn { width: 34px; height: 34px; }
+    table { font-size: 0.75rem; }
+    th, td { padding: 0.45rem 0.55rem; }
+}
+
+/* ────────────────────────────────────────────
+   Responsive: Tablets (≥768px)
+   ──────────────────────────────────────────── */
 @media (min-width: 768px) {
+    .app-header { padding: 1.25rem 1.5rem; }
     .logo-text { font-size: 1.25rem; }
     .msg-avatar { width: 34px; height: 34px; }
     .msg-content { font-size: 0.95rem; padding: 0.8rem 1.2rem; }
+    .controls { padding: 1rem 1.5rem 1.25rem; }
+    .action-chip { font-size: 0.8rem; padding: 0.45rem 0.9rem; }
+    .action-chip:hover { background: var(--border-color); }
+}
+
+/* ────────────────────────────────────────────
+   Responsive: Desktop (≥1024px)
+   ──────────────────────────────────────────── */
+@media (min-width: 1024px) {
+    .app-wrapper { border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color); }
     .controls { padding: 1.25rem 2rem; }
+    .msg-content { max-width: 680px; }
+    .message-group { max-width: 85%; }
+    #chat-window { padding: 2rem 1.5rem; }
+}
+
+/* ────────────────────────────────────────────
+   Universal: Prevent text overflow on all sizes
+   ──────────────────────────────────────────── */
+.msg-content {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
 }
 
 @keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
