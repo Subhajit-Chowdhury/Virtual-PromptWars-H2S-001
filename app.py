@@ -14,11 +14,17 @@ from assistant.calendar_handler import CalendarHandler
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'datapulse_secret_key_123')
-UPLOAD_FOLDER = 'uploads'
+
+# Vercel Fix: Use /tmp for file uploads as the root filesystem is read-only
+UPLOAD_FOLDER = '/tmp/uploads'
 ALLOWED_EXTENSIONS = {'csv', 'xlsx', 'json'}
 
+# Ensure the upload directory exists in the writable /tmp space
 if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+    try:
+        os.makedirs(UPLOAD_FOLDER)
+    except Exception as e:
+        print(f"Warning: Could not create upload folder: {e}")
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -41,12 +47,18 @@ def upload_file():
     
     if file and allowed_file(file.filename):
         ext = file.filename.rsplit('.', 1)[1].lower()
-        filename = f"active_data.{ext}"
+        filename = secure_filename(f"active_data.{ext}")
         file_path = os.path.join(UPLOAD_FOLDER, filename)
         
-        # Clean up any previous uploads
-        for f in os.listdir(UPLOAD_FOLDER):
-            os.remove(os.path.join(UPLOAD_FOLDER, f))
+        # Clean up any previous uploads in /tmp
+        if os.path.exists(UPLOAD_FOLDER):
+            for f in os.listdir(UPLOAD_FOLDER):
+                try:
+                    os.remove(os.path.join(UPLOAD_FOLDER, f))
+                except:
+                    pass
+        else:
+            os.makedirs(UPLOAD_FOLDER)
             
         file.save(file_path)
         
@@ -68,12 +80,12 @@ def upload_file():
 @app.route('/reset-data', methods=['POST'])
 def reset_data():
     session['active_mode'] = 'sheets'
-    # Clean up uploads
-    for f in os.listdir(UPLOAD_FOLDER):
-        try:
-            os.remove(os.path.join(UPLOAD_FOLDER, f))
-        except:
-            pass
+    if os.path.exists(UPLOAD_FOLDER):
+        for f in os.listdir(UPLOAD_FOLDER):
+            try:
+                os.remove(os.path.join(UPLOAD_FOLDER, f))
+            except:
+                pass
     return jsonify({'success': True})
 
 @app.route('/chat', methods=['POST'])
@@ -82,7 +94,7 @@ def chat():
     if not user_message:
         return jsonify({'error': 'No message provided'}), 400
     
-    if not os.getenv('GEMINI_API_KEY'):
+    if not os.getenv('GEMINI_API_KEY') and not os.getenv('GEMINI_API_KEYS'):
         return jsonify({'assistant': '⚠️ Vercel Setup Needed: Please add your GEMINI_API_KEY to Environment Variables.'}), 200
         
     try:
@@ -94,7 +106,7 @@ def chat():
         response_text = ""
 
         if intent == 'SHEETS':
-            # Priority: Check if an uploaded file exists
+            # Priority: Check if an uploaded file exists in /tmp
             if session.get('active_mode') == 'upload':
                 filename = session.get('active_file')
                 file_path = os.path.join(UPLOAD_FOLDER, filename)
@@ -103,9 +115,8 @@ def chat():
                     context = f"AUDIT_REPORT: {json.dumps(audit_report)}\nUPLOADED_FILE_DATA:\n{data}"
                     response_text = gemini.get_response(user_message, context=context)
                 else:
-                    session['active_mode'] = 'sheets' # Fallback
+                    session['active_mode'] = 'sheets'
             
-            # Default: Use Google Sheets
             if not response_text:
                 spreadsheet_id = os.getenv('SPREADSHEET_ID')
                 data, audit_report = sheets.get_sheet_data(spreadsheet_id)
