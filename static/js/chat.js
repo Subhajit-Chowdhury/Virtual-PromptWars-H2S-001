@@ -29,10 +29,16 @@ async function sendMessage(customText = null) {
     if (!customText) userInput.value = '';
     appendMessage('user', text);
 
-    // Typing indicator
+    // Skeleton Loader instead of just dots
     const typingDiv = document.createElement('div');
     typingDiv.className = 'message assistant typing';
-    typingDiv.innerHTML = '<div class="avatar">🤖</div><div class="content"><p>...</p></div>';
+    typingDiv.innerHTML = `
+        <div class="avatar">🤖</div>
+        <div class="content">
+            <div class="skeleton sk-1"></div><br>
+            <div class="skeleton sk-2"></div><br>
+            <div class="skeleton sk-3"></div>
+        </div>`;
     chatContainer.appendChild(typingDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
 
@@ -52,13 +58,12 @@ async function sendMessage(customText = null) {
             appendMessage('assistant', 'Oops, I had a little hiccup. Could you try that again?');
         }
     } catch (error) {
-        chatContainer.removeChild(typingDiv);
-        appendMessage('assistant', 'Sorry, I'm having trouble connecting to my brain right now! Please check your server.');
+        if (chatContainer.contains(typingDiv)) chatContainer.removeChild(typingDiv);
+        appendMessage('assistant', 'I'm having trouble connecting to my brain! Please check your Vercel Environment Variables (GEMINI_API_KEY, SPREADSHEET_ID, etc).');
         console.error('Error:', error);
     }
 }
 
-// Global function to handle suggestion chips
 function handleSuggestion(text) {
     sendMessage(text);
 }
