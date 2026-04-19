@@ -2,7 +2,7 @@
 
 > **Your data shouldn't just sit in a spreadsheet. It should talk to you.**
 
-🔗 **Live Demo**: [virtual-prompt-wars-h2s-001.vercel.app](https://virtual-prompt-wars-h2s-001.vercel.app)  
+🔗 **Live Demo**: [virtual-prompt-wars-h2s-001.vercel.app](https://virtual-prompt-wars-h2s-001.vercel.app) · [Mirror](https://antigravity-data-assistant-i3z33o2a3.vercel.app/)  
 📁 **Source Code**: [GitHub Repository](https://github.com/Subhajit-Chowdhury/Virtual-PromptWars-H2S-001)  
 👤 **Built by**: [Subhajit Chowdhury](https://github.com/Subhajit-Chowdhury) · AWS Data Engineer  
 🔗 **Connect**: [LinkedIn](https://www.linkedin.com/in/subhajit-chowdhury/) · [GitHub](https://github.com/Subhajit-Chowdhury)
