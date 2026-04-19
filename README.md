@@ -1,7 +1,7 @@
-# 📊 Antigravity Data Assistant
+# 📊 DataPulse Assistant
 > **The Intelligence Layer for Modern Data Professionals.**
 
-The **Antigravity Data Assistant** is a smart, dynamic agent designed to bridge the gap between static spreadsheet data and action-oriented scheduling. It allows users to query their Google Sheets and manage their Google Calendar through a single, premium natural language interface.
+The **DataPulse Assistant** is a smart, dynamic agent designed to bridge the gap between static spreadsheet data and action-oriented scheduling. It allows users to query their Google Sheets and manage their Google Calendar through a single, premium natural language interface.
 
 ---
 
@@ -14,10 +14,10 @@ In modern data engineering and analytics, professionals often suffer from "conte
 Our goal was to build an integrated, AI-first solution that consolidates these fragmented workflows into a single, high-performance interface. We set out to create a partner that is not just intelligent enough to understand natural language, but dynamic enough to fetch live data and execute actions automatically—all while maintaining a secure, lightweight footprint under 1MB.
 
 ### **The Engineering Approach**
-We engineered a high-precision **Python/Flask** application powered by **Google Gemini 1.5 Flash**. By developing modular handlers for the Google Sheets and Calendar APIs, we created a live data pipeline that translates ambiguous user queries into structured data lookups and automated scheduling events. The entire system is wrapped in a **Glassmorphic UI** designed for maximum responsiveness across any device.
+We engineered a high-precision **Python/Flask** application powered by **Google Gemini 1.5 Flash**. By developing modular handlers for the Google Sheets and Calendar APIs, we created a live data pipeline that translates ambiguous user queries into structured data lookups and automated scheduling events. The entire system is wrapped in a **Modern Classic UI** designed for maximum responsiveness across any device.
 
 ### **Impact & Scalability**
-The resulting "Antigravity Partner" eliminates context switching by providing zero-barrier analytics. It allows stakeholders to query complex enterprise data in plain English. While currently optimized for Google Sheets, the architecture is **Enterprise-Ready**: it can be scaled to BigQuery or Snowflake (handling GB/TB/PB of data) simply by swapping the data handler, without changing the core user experience.
+The resulting "DataPulse Partner" eliminates context switching by providing zero-barrier analytics. It allows stakeholders to query complex enterprise data in plain English. While currently optimized for Google Sheets, the architecture is **Enterprise-Ready**: it can be scaled to BigQuery or Snowflake (handling GB/TB/PB of data) simply by swapping the data handler, without changing the core user experience.
 
 ---
 

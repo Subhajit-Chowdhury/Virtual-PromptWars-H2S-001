@@ -13,11 +13,10 @@ class GeminiHandler:
             raise ValueError("GEMINI_API_KEY not found in environment")
         
         genai.configure(api_key=api_key)
-        # Using -latest variant to be robust across different API versions
         self.model = genai.GenerativeModel('gemini-flash-latest')
         
         self.system_prompt = """
-        You are the Antigravity Data Assistant, your friendly and smart data partner! 
+        You are the DataPulse Assistant, your friendly and smart data partner! 
         Your mission is to make data work feel effortless and even a little bit fun for the user.
         
         Persona:
