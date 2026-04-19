@@ -29,7 +29,7 @@ async function sendMessage(customText = null) {
     if (!customText) userInput.value = '';
     appendMessage('user', text);
 
-    // Skeleton Loader for Classic Style
+    // Skeleton Loader with 3 varying lines for better realism
     const typingDiv = document.createElement('div');
     typingDiv.className = 'message-group assistant typing';
     typingDiv.innerHTML = `
@@ -37,6 +37,7 @@ async function sendMessage(customText = null) {
         <div class="msg-content">
             <div class="skeleton sk-1"></div>
             <div class="skeleton sk-2"></div>
+            <div class="skeleton sk-3"></div>
         </div>`;
     chatContainer.appendChild(typingDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
