@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity | Data Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">
+                <span class="gradient-text">Antigravity</span>
+                <span class="sub-logo">Data Intelligence</span>
+            </div>
+            <div class="status-badge">
+                <span class="indicator"></span> Live Data Pipeline
+            </div>
+        </header>
+
+        <main id="chat-container">
+            <div class="message assistant">
+                <div class="avatar">🤖</div>
+                <div class="content">
+                    <p>Hello! I'm your **Antigravity Data Assistant**. I can help you summarize sales, query spreadsheets, or set reminders.</p>
+                    <p>Try asking: <em>"Summarize my sales sheet"</em> or <em>"What were the units sold in North region?"</em></p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="input-wrapper">
+                <input type="text" id="user-input" placeholder="Ask about your data..." autocomplete="off">
+                <button id="send-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+            <p class="footer-note">Powered by Google Gemini & Google Services</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html>
