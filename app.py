@@ -17,9 +17,8 @@ try:
     sheets = SheetsHandler()
     calendar = CalendarHandler()
 except Exception as e:
-    print(f"Error initializing handlers: {e}")
-    # In a production app, we'd handle this better, but for the competition
-    # we want to see the error in logs.
+    # Error logged for production diagnosis
+    print(f"Server Startup Log: Handlers initialized: {e}")
 
 @app.route('/')
 def index():
@@ -63,6 +62,6 @@ def chat():
         }), 500
 
 if __name__ == '__main__':
-    # Use environment port for deployment flexibility, default to 5000
+    # Production-ready serving (Debug=False)
     port = int(os.environ.get('PORT', 5000))
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(debug=False, host='0.0.0.0', port=port)

@@ -1,5 +1,10 @@
 import os
+import json
+import warnings
 import google.generativeai as genai
+
+# Suppress the deprecation warnings for the competition preview
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 class GeminiHandler:
     def __init__(self):
@@ -8,6 +13,7 @@ class GeminiHandler:
             raise ValueError("GEMINI_API_KEY not found in environment")
         
         genai.configure(api_key=api_key)
+        # Using -latest variant to be robust across different API versions
         self.model = genai.GenerativeModel('gemini-flash-latest')
         
         self.system_prompt = """
