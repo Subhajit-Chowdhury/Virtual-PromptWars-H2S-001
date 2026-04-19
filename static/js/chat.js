@@ -102,6 +102,13 @@ fileInput.addEventListener('change', async (e) => {
         return;
     }
 
+    const MAX_SIZE_MB = 2;
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+        appendMessage('assistant', `❌ File too large. Maximum allowed size is **${MAX_SIZE_MB}MB**. Your file is **${(file.size / 1024 / 1024).toFixed(1)}MB**. Please use a smaller dataset.`);
+        fileInput.value = '';
+        return;
+    }
+
     appendMessage('user', `📎 Uploading ${file.name}...`);
     
     const formData = new FormData();

@@ -51,6 +51,14 @@ def upload_file():
     if not file or not allowed_file(file.filename):
         return jsonify({'success': False, 'error': 'Unsupported file type. Only .csv, .xlsx, and .json are allowed.'}), 400
 
+    # Backend file size guard (2MB max) — defence in depth
+    MAX_FILE_SIZE = 2 * 1024 * 1024  # 2MB
+    file.seek(0, 2)  # Seek to end to get size
+    file_size = file.tell()
+    file.seek(0)  # Reset to beginning for saving
+    if file_size > MAX_FILE_SIZE:
+        return jsonify({'success': False, 'error': f'File too large ({file_size // 1024}KB). Maximum is 2MB.'}), 400
+
     try:
         ensure_upload_dir()
         
