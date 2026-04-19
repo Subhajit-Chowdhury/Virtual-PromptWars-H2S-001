@@ -1,4 +1,5 @@
 import os
+import json
 from datetime import datetime, timedelta
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -6,23 +7,29 @@ from googleapiclient.discovery import build
 class CalendarHandler:
     def __init__(self):
         self.scopes = ['https://www.googleapis.com/auth/calendar']
+        
+        # Production Secret Management: Support both file-based and ENV-based credentials
+        creds_json = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
         self.creds_path = os.getenv('GOOGLE_CREDENTIALS_PATH')
         
-        if not self.creds_path or not os.path.exists(self.creds_path):
-            raise FileNotFoundError(f"Service account file not found: {self.creds_path}")
+        if creds_json:
+            info = json.loads(creds_json)
+            self.creds = service_account.Credentials.from_service_account_info(
+                info, scopes=self.scopes)
+        elif self.creds_path and os.path.exists(self.creds_path):
+            self.creds = service_account.Credentials.from_service_account_file(
+                self.creds_path, scopes=self.scopes)
+        else:
+            raise FileNotFoundError("No Google credentials found")
             
-        self.creds = service_account.Credentials.from_service_account_file(
-            self.creds_path, scopes=self.scopes)
         self.service = build('calendar', 'v3', credentials=self.creds)
 
     def create_reminder(self, summary, description="", start_time_str=None):
         """Creates a calendar event."""
         try:
-            # Default to 1 hour from now if no time provided
             if not start_time_str:
                 start_time = datetime.now() + timedelta(hours=1)
             else:
-                # Basic parsing, in a real app would use Gemini to parse dates
                 start_time = datetime.now() + timedelta(hours=1)
                 
             end_time = start_time + timedelta(minutes=30)
