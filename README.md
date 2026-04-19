@@ -2,7 +2,7 @@
 
 > **Data shouldn't stop at analysis. It should help drive the next step.**
 
-🌐 **Live Demo**: [virtual-prompt-wars-h2s-001.vercel.app](https://virtual-prompt-wars-h2s-001.vercel.app) · [Mirror](https://antigravity-data-assistant-i3z33o2a3.vercel.app/)  
+🌐 **Live Demo**: [virtual-prompt-wars-h2-s-001.vercel.app](https://virtual-prompt-wars-h2-s-001.vercel.app/) · [Mirror](https://antigravity-data-assistant-i3z33o2a3.vercel.app/)  
 🧑‍💻 **Built by**: [Subhajit Chowdhury](https://github.com/Subhajit-Chowdhury) · AWS Data Engineer  
 🤝 **Connect**: [LinkedIn](https://linkedin.com/in/subhajit00100/) · [GitHub](https://github.com/Subhajit-Chowdhury) · [Medium](https://subhajitchowdhury.medium.com/)
 
